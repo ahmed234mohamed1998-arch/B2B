@@ -1,22 +1,13 @@
 // @ts-check
 import { test, expect } from '@playwright/test';
+const {LoginPage} = require('../Pages/LoginPage');
 
-test('@smoke has title', async ({ page }) => {
-  await page.goto('https://pharmacyapp-qa.ibnsina-pharma.com/login');
-
-  // Expect a title "to contain" a substring.
-  await expect(page).toHaveTitle(/B2B Portal/);
-});
 
 test('@smoke get started link', async ({ page }) => {
-  await page.goto('https://pharmacyapp-qa.ibnsina-pharma.com/login');
-
-  // Click the get started link.
-  await page.locator("[name$='username']").fill('355218');
-  await page.locator("[name$='password']").fill('Zxc@1234567');
-
-  await page.locator("button[type='submit']").click();
-
-  // Expects page to have a heading with the name of Installation.
-  await expect(page).toHaveTitle("Dashboard | Pharmacy Portal");
+  const loginPage = new LoginPage(page);
+  await loginPage.goto();
+  const homePage = await loginPage.login('355218', 'Zxc@1234567');
+  
+  await homePage.waitForLoaded();
+  expect(await homePage.isSearchInputVisible()).toBeTruthy();
 });

@@ -1,12 +1,14 @@
+const { CartPage } = require("./CartPage");
+
 class HomePage {
   constructor(page) {
     this.page = page;
-    this.searchInput = page.locator('input[type="search"], input[aria-label="Search"], input[name="search"]');
+    this.searchInput = page.getByPlaceholder('البحث عن أدوية لإضافتها إلى السلة');
     this.searchResults = page.locator('.search-results, .results-list, .results-item');
     this.noResultsMessage = page.locator('text=لا توجد نتائج');
     this.orderNowButton = page.locator('button:has-text("Order Now"), button:has-text("اطلب الآن"), .order-now');
     this.bellIcon = page.locator('button[aria-label="Notifications"], .icon-bell, button:has-text("Notifications")');
-    this.cartIcon = page.locator('button[aria-label="Cart"], .icon-cart, button:has-text("Cart")');
+    this.cartIcon = page.locator('.cart-container');
     this.startsWithCheckbox = page.locator('label:has-text("starts with") input[type="checkbox"], input[type="checkbox"][name="startsWith"]');
     this.containsCheckbox = page.locator('label:has-text("contains") input[type="checkbox"], input[type="checkbox"][name="contains"]');
     this.newOrderModuleIcon = page.locator('button[aria-label="New Order"], .module-new-order');
@@ -24,7 +26,12 @@ class HomePage {
   async typeSearchLetter(letter) {
     await this.searchInput.type(letter);
   }
-
+  async waitForLoaded() {
+    await this.searchInput.waitFor({ state: 'visible' });
+  }
+  async isSearchInputVisible(){
+    return await this.searchInput.isVisible();
+  }
   async getSearchResults() {
     return this.searchResults.allTextContents();
   }
@@ -43,6 +50,8 @@ class HomePage {
 
   async openCart() {
     await this.cartIcon.click();
+    return new CartPage(this.page);
+
   }
 
   async setSearchMode(mode) {
@@ -85,4 +94,4 @@ class HomePage {
   }
 }
 
-export default HomePage;
+module.exports = { HomePage };

@@ -1,3 +1,5 @@
+const {HomePage} = require("./HomePage");
+
 class LoginPage {
   constructor(page) {
     this.page = page;
@@ -13,7 +15,10 @@ class LoginPage {
   async login(pharmacyCode, password) {
     await this.pharmacyCodeField.fill(pharmacyCode);
     await this.passwordField.fill(password);
+
     await this.loginButton.click();
+
+    return new HomePage(this.page);
   }
 }
 module.exports = {LoginPage};
