@@ -1,7 +1,26 @@
-const { CartPage } = require("./CartPage");
+import { Locator, Page } from '@playwright/test';
+import { CartPage } from './CartPage';
 
-class HomePage {
-  constructor(page) {
+export class HomePage {
+  // Define property types
+  readonly page: Page;
+  readonly searchInput: Locator;
+  readonly searchResults: Locator;
+  readonly noResultsMessage: Locator;
+  readonly orderNowButton: Locator;
+  readonly bellIcon: Locator;
+  readonly cartIcon: Locator;
+  readonly startsWithCheckbox: Locator;
+  readonly containsCheckbox: Locator;
+  readonly newOrderModuleIcon: Locator;
+  readonly expiryModuleIcon: Locator;
+  readonly promotionsModuleIcon: Locator;
+  readonly paymentsModuleIcon: Locator;
+  readonly newPriceModuleIcon: Locator;
+  readonly taxesModuleIcon: Locator;
+  readonly cardItems: Locator;
+
+  constructor(page: Page) {
     this.page = page;
     this.searchInput = page.getByPlaceholder('البحث عن أدوية لإضافتها إلى السلة');
     this.searchResults = page.locator('.search-results, .results-list, .results-item');
@@ -17,44 +36,54 @@ class HomePage {
     this.paymentsModuleIcon = page.locator('button[aria-label="Payments"], .module-payments');
     this.newPriceModuleIcon = page.locator('button[aria-label="New Price"], .module-new-price');
     this.taxesModuleIcon = page.locator('button[aria-label="Taxes"], .module-taxes');
+    this.cardItems = page.locator('.order-item-card');
   }
 
-  async search(keyword) {
+  async search(keyword: string): Promise<void> {
     await this.searchInput.pressSequentially(keyword);
   }
 
-  async typeSearchLetter(letter) {
-    await this.searchInput.type(letter);
-  }
-  async waitForLoaded() {
-    await this.searchInput.waitFor({ state: 'visible' });
-  }
-  async isSearchInputVisible(){
-    return await this.searchInput.isVisible();
-  }
-  async getSearchResults() {
-    return this.searchResults.allTextContents();
+  async typeSearchLetter(letter: string): Promise<void> {
+    await this.searchInput.press(letter); // Changed from .type to .press as .type is deprecated in newer Playwright
   }
 
-  async hasNoResults() {
+  async waitForLoaded(): Promise<void> {
+    await this.searchInput.waitFor({ state: 'visible' });
+  }
+
+  async isSearchInputVisible(): Promise<boolean> {
+    return await this.searchInput.isVisible();
+  }
+
+  async getSearchResults(): Promise<string[]> {
+    return await this.searchResults.allTextContents();
+  }
+
+  async hasNoResults(): Promise<boolean> {
     return await this.noResultsMessage.isVisible();
   }
 
-  async openOrderNow() {
+  async openOrderNow(): Promise<void> {
     await this.orderNowButton.click();
   }
 
-  async openNotifications() {
+  async openNotifications(): Promise<void> {
     await this.bellIcon.click();
   }
 
-  async openCart() {
+  async openCart(): Promise<CartPage> {
     await this.cartIcon.click();
     return new CartPage(this.page);
-
   }
 
-  async setSearchMode(mode) {
+  async getCartItemCount(): Promise<number> {
+    return await this.cardItems.count();
+  }
+  async pressEscape(): Promise<void> {
+    await this.page.keyboard.press('Escape');
+  }
+
+  async setSearchMode(mode: 'starts with' | 'contains'): Promise<void> {
     const normalized = mode.toLowerCase();
     if (normalized === 'starts with') {
       if (!(await this.startsWithCheckbox.isChecked())) {
@@ -69,29 +98,27 @@ class HomePage {
     }
   }
 
-  async openNewOrderModule() {
+  async openNewOrderModule(): Promise<void> {
     await this.newOrderModuleIcon.click();
   }
 
-  async openExpiryModule() {
+  async openExpiryModule(): Promise<void> {
     await this.expiryModuleIcon.click();
   }
 
-  async openPromotionsModule() {
+  async openPromotionsModule(): Promise<void> {
     await this.promotionsModuleIcon.click();
   }
 
-  async openPaymentsModule() {
+  async openPaymentsModule(): Promise<void> {
     await this.paymentsModuleIcon.click();
   }
 
-  async openNewPriceModule() {
+  async openNewPriceModule(): Promise<void> {
     await this.newPriceModuleIcon.click();
   }
 
-  async openTaxesModule() {
+  async openTaxesModule(): Promise<void> {
     await this.taxesModuleIcon.click();
   }
 }
-
-module.exports = { HomePage };

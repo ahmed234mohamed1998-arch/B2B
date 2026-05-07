@@ -1,6 +1,6 @@
 // @ts-check
 import { test, expect } from '@playwright/test';
-const {LoginPage} = require('../Pages/LoginPage');
+import {LoginPage} from '../Pages/LoginPage';
 
 
 test('@smoke get started link', async ({ page }) => {
